@@ -203,7 +203,6 @@ class ExpandableFabState extends State<ExpandableFab>
       onTap: () => toggle(),
       child: Stack(
         children: [
-          Container(),
           if (blur != null)
             IgnorePointer(
               ignoring: !_open,
@@ -235,10 +234,10 @@ class ExpandableFabState extends State<ExpandableFab>
                 ),
               ),
             ),
-          ..._buildExpandingActionButtons(),
           Stack(
               children: [
                 _buildTapToCloseFab(),
+                ..._buildExpandingActionButtons()
                 _buildTapToOpenFab(),
               ],
             ),
