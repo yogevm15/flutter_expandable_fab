@@ -51,26 +51,6 @@ class ExpandableFabCloseButtonStyle {
   final Color? backgroundColor;
 }
 
-class _ExpandableFabLocation extends StandardFabLocation {
-  final ValueNotifier<ScaffoldPrelayoutGeometry?> scaffoldGeometry =
-      ValueNotifier(null);
-
-  @override
-  double getOffsetX(
-      ScaffoldPrelayoutGeometry scaffoldGeometry, double adjustment) {
-    Future.microtask(() {
-      this.scaffoldGeometry.value = scaffoldGeometry;
-    });
-    return 0;
-  }
-
-  @override
-  double getOffsetY(
-      ScaffoldPrelayoutGeometry scaffoldGeometry, double adjustment) {
-    return 0;
-  }
-}
-
 /// Fab button that can show/hide multiple action buttons with animation.
 @immutable
 class ExpandableFab extends StatefulWidget {
@@ -215,36 +195,15 @@ class ExpandableFabState extends State<ExpandableFab>
 
   @override
   Widget build(BuildContext context) {
-    final location = ExpandableFab.location as _ExpandableFabLocation;
-    Offset? offset;
-    Widget? cache;
-    return ValueListenableBuilder<ScaffoldPrelayoutGeometry?>(
-      valueListenable: location.scaffoldGeometry,
-      builder: ((context, geometry, child) {
-        if (geometry == null) {
-          return const SizedBox.shrink();
-        }
-        final x = kFloatingActionButtonMargin + geometry.minInsets.right;
-        final bottomContentHeight =
-            geometry.scaffoldSize.height - geometry.contentBottom;
-        final y = kFloatingActionButtonMargin +
-            math.max(geometry.minViewPadding.bottom, bottomContentHeight);
-        if (offset != Offset(x, y)) {
-          offset = Offset(x, y);
-          cache = _buildButtons(offset!);
-        }
-        return cache!;
-      }),
-    );
+    return  _buildButtons();
   }
 
-  Widget _buildButtons(Offset offset) {
+  Widget _buildButtons() {
     final blur = widget.overlayStyle?.blur;
     final overlayColor = widget.overlayStyle?.color;
     return GestureDetector(
       onTap: () => toggle(),
       child: Stack(
-        alignment: Alignment.bottomRight,
         children: [
           Container(),
           if (blur != null)
@@ -278,17 +237,14 @@ class ExpandableFabState extends State<ExpandableFab>
                 ),
               ),
             ),
-          ..._buildExpandingActionButtons(offset),
-          Transform.translate(
-            offset: -offset,
-            child: Stack(
+          ..._buildExpandingActionButtons(),
+          Stack(
               alignment: Alignment.center,
               children: [
                 _buildTapToCloseFab(),
                 _buildTapToOpenFab(),
               ],
             ),
-          ),
         ],
       ),
     );
@@ -316,7 +272,7 @@ class ExpandableFabState extends State<ExpandableFab>
     }
   }
 
-  List<Widget> _buildExpandingActionButtons(Offset offset) {
+  List<Widget> _buildExpandingActionButtons() {
     final children = <Widget>[];
     final count = widget.children.length;
     final step = widget.fanAngle / (count - 1);
@@ -342,7 +298,7 @@ class ExpandableFabState extends State<ExpandableFab>
           directionInDegrees: dir + (90 - widget.fanAngle) / 2,
           maxDistance: dist,
           progress: _expandAnimation,
-          offset: offset + widget.childrenOffset,
+          offset: widget.childrenOffset,
           child: widget.children[i],
         ),
       );
@@ -371,27 +327,27 @@ class ExpandableFabState extends State<ExpandableFab>
           duration: duration,
           child: widget.collapsedFabSize == ExpandableFabSize.regular
               ? FloatingActionButton(
-                  heroTag: widget.openButtonHeroTag,
-                  foregroundColor: widget.foregroundColor,
-                  backgroundColor: widget.backgroundColor,
-                  onPressed: toggle,
-                  child: AnimatedRotation(
-                    duration: duration,
-                    turns: _open ? -0.5 : 0,
-                    child: widget.child,
-                  ),
-                )
+            heroTag: widget.openButtonHeroTag,
+            foregroundColor: widget.foregroundColor,
+            backgroundColor: widget.backgroundColor,
+            onPressed: toggle,
+            child: AnimatedRotation(
+              duration: duration,
+              turns: _open ? -0.5 : 0,
+              child: widget.child,
+            ),
+          )
               : FloatingActionButton.small(
-                  heroTag: widget.openButtonHeroTag,
-                  foregroundColor: widget.foregroundColor,
-                  backgroundColor: widget.backgroundColor,
-                  onPressed: toggle,
-                  child: AnimatedRotation(
-                    duration: duration,
-                    turns: _open ? -0.5 : 0,
-                    child: widget.child,
-                  ),
-                ),
+            heroTag: widget.openButtonHeroTag,
+            foregroundColor: widget.foregroundColor,
+            backgroundColor: widget.backgroundColor,
+            onPressed: toggle,
+            child: AnimatedRotation(
+              duration: duration,
+              turns: _open ? -0.5 : 0,
+              child: widget.child,
+            ),
+          ),
         ),
       ),
     );
@@ -424,8 +380,8 @@ class _ExpandingActionButton extends StatelessWidget {
           progress.value * maxDistance,
         );
         return Positioned(
-          right: offset.dx + pos.dx,
-          bottom: offset.dy + pos.dy,
+          right: pos.dx,
+          bottom: pos.dy,
           child: Transform.rotate(
             angle: (1.0 - progress.value) * math.pi / 2,
             child: child!,
