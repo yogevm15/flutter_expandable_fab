@@ -54,8 +54,6 @@ class ExpandableFabCloseButtonStyle {
 /// Fab button that can show/hide multiple action buttons with animation.
 @immutable
 class ExpandableFab extends StatefulWidget {
-  static final FloatingActionButtonLocation location = _ExpandableFabLocation();
-
   const ExpandableFab({
     Key? key,
     this.distance = 100,
