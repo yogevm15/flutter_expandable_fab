@@ -237,7 +237,7 @@ class ExpandableFabState extends State<ExpandableFab>
           Stack(
               children: [
                 _buildTapToCloseFab(),
-                ..._buildExpandingActionButtons()
+                ..._buildExpandingActionButtons(),
                 _buildTapToOpenFab(),
               ],
             ),
