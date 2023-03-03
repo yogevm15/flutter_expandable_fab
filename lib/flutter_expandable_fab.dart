@@ -237,7 +237,6 @@ class ExpandableFabState extends State<ExpandableFab>
             ),
           ..._buildExpandingActionButtons(),
           Stack(
-              alignment: Alignment.center,
               children: [
                 _buildTapToCloseFab(),
                 _buildTapToOpenFab(),
