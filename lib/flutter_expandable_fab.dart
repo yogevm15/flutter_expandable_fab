@@ -202,24 +202,27 @@ class ExpandableFabState extends State<ExpandableFab>
     return GestureDetector(
       onTap: () => toggle(),
       child: Stack(
+        
         children: [
           if (blur != null)
-            IgnorePointer(
-              ignoring: !_open,
-              child: TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0.0, end: _open ? blur : 0.0),
-                duration: widget.duration,
-                curve: Curves.easeInOut,
-                builder: (_, value, child) {
-                  if (value < 0.001) {
-                    return child!;
-                  }
-                  return BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: value, sigmaY: value),
-                    child: child,
-                  );
-                },
-                child: Container(color: Colors.transparent),
+            SizedBox.expand(
+              child: IgnorePointer(
+                ignoring: !_open,
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: _open ? blur : 0.0),
+                 duration: widget.duration,
+                 curve: Curves.easeInOut,
+                 builder: (_, value, child) {
+                   if (value < 0.001) {
+                     return child!;
+                   }
+                   return BackdropFilter(
+                     filter: ImageFilter.blur(sigmaX: value, sigmaY: value),
+                     child: child,
+                   );
+                 },
+                 child: Container(color: Colors.transparent),
+                ),
               ),
             ),
           if (overlayColor != null)
